@@ -1,0 +1,39 @@
+------------------------------3D3 PROJECT 2 PLAN------------------------------
+
+STEPS:
+	1. Instantiate a router object
+	2. Encapsulate distance vector data in a UDP segment
+	2. Exchange UDP Distance vector messages with other routers
+	3. Upon receiving a message, parse it and use the data to construct a cost matrix
+	4. Use the Bellman-Ford Algorithm to find the least cost path using this matrix
+	5. If a new least cost path is found, encapsulate the new distance vector in a UDP segment and send it to neighbouring routers
+
+
+-> ROUTER CLASS: router.hpp, router.cpp
+
+	-> MEMBERS:
+		-> router identifier  (letter of router: A, B, C, D, E, F)
+		-> int router_port   (UDP port # of router: 10000-(A), 10001-(B), 10002-(C), 10003-(D), 10004-(E), 10005-(F))
+		-> other routers (array containing letter identifiers of other routers)
+		-> link costs (array containing link cost to each router)
+		-> int costs[6] (array containing cost to each router)
+		-> outgoing ports (array of port numbers for next-hop routers)
+		-> destination ports (array of destinaton routers)
+
+	-> METHODS:
+		-> Overloaded Constructor (creates a router given the name, port # and link costs)
+		-> Getter Methods: GetName, GetPort.....
+		-> Setter Methods: SetName, SetPort.....
+		-> Print_Router_Table (Prints out Forwarding table for the particular router to the terminal)
+			--------------------------------------------------------------------
+			TIMESTAMP: ----- seconds
+
+			Dest. Router	Cost	Outgoing UDP Port	Dest. UDP Port
+			--------------------------------------------------------------------
+			B		4	10000			10001
+			E		1	10000			10005	
+			--------------------------------------------------------------------
+		-> Write_Router_Table (Writes the forwarding table for the particular router into its .txt file)
+		-> Construct_Message (Encapsulates Distance Vector Forwarding Table in a UDP segment)
+		-> Parse_Message (Parse Distance Vector data from the received UDP segment)
+		-> Update_Router_Table (Use Bellman-Ford algorithm to update least cost path to each other router using the received data)
