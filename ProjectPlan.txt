@@ -3,20 +3,32 @@
 -> EACH ROUTER MUST BE ABLE TO:
 	1. Send and Receive UDP Segments via its own UDP Socket.
 	2. Encapsulate Distance Vector data in a UDP Segment.
-	2. Exchange UDP Distance vector messages with neighbouring routers.
+	2. Exchange UDP Distance vector messages with neighbouring routers. (distance vectors are arrays with the cost to each router)
 	3. Upon receiving a message, Parse it and use the data to construct a cost matrix
 	4. Use the Bellman-Ford Algorithm to find the least cost path using this matrix
 	5. If a new least cost path is found, encapsulate the new distance vector in a UDP segment and send it to neighbouring routers
 	6. Write the Router's forwarding/routing table to its own .txt file.
-	7. If a data packet is injected into the network, each router must use its forwarding table to move the packet to its 		destination.
+	7. If a data packet is injected into the network, each router must use its forwarding table to move the packet to its destination.
 
--> Classes/Files Needed:
+
+-> CLASSES/FILES NEEDED FOR THE PROJECT:
 	-> my-router.cpp (main file for demo)
 	-> router.hpp, router.cpp (header and implementation of router class)
 	-> data_segment.hpp, data.segment.cpp (header and implementation of data segment class)
 
--> ROUTER CLASS: router.hpp, router.cpp
 
+-> PROJECT MAIN FILE: my-router.cpp
+	-> What will happen in the main file:
+		1. A router object will be created given its identifier letter, its UDP port and the initial distance vector with the link costs to its direct neighbours.
+		2. The router will create a forwarding table using the initial distance vector data.
+		3. The router will encapsulate its distance vector in a UDP segment and send it to its immediate neighbours via its UDP socket.
+		4. The router will receive UDP segments from its neighbours via its socket.
+		5. Upon receiving a segment, the router will parse the distance vector data from the segment.
+		6. The router will use the received distance vector data from its neighbours to update its own distance vector data using the Bellman-Ford least-cost algorithm.
+		7. If the router's distance vector changes, i.e. a new least cost path is found, the router must send this new distance vector to its neighbours and write its new forwarding table to its text file.
+		
+
+-> ROUTER CLASS: router.hpp, router.cpp
 	-> MEMBERS:
 		-> router identifier  (letter of router: A, B, C, D, E, F)
 		-> int router_port   (UDP port # of router: 10000-(A), 10001-(B), 10002-(C), 10003-(D), 10004-(E), 10005-(F))
