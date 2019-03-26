@@ -1,13 +1,19 @@
 ------------------------------3D3 PROJECT 2 PLAN------------------------------
 
-STEPS:
-	1. Instantiate a router object
-	2. Encapsulate distance vector data in a UDP segment
-	2. Exchange UDP Distance vector messages with other routers
-	3. Upon receiving a message, parse it and use the data to construct a cost matrix
+-> EACH ROUTER MUST BE ABLE TO:
+	1. Send and Receive UDP Segments via its own UDP Socket.
+	2. Encapsulate Distance Vector data in a UDP Segment.
+	2. Exchange UDP Distance vector messages with neighbouring routers.
+	3. Upon receiving a message, Parse it and use the data to construct a cost matrix
 	4. Use the Bellman-Ford Algorithm to find the least cost path using this matrix
 	5. If a new least cost path is found, encapsulate the new distance vector in a UDP segment and send it to neighbouring routers
+	6. Write the Router's forwarding/routing table to its own .txt file.
+	7. If a data packet is injected into the network, each router must use its forwarding table to move the packet to its 		destination.
 
+-> Classes/Files Needed:
+	-> my-router.cpp (main file for demo)
+	-> router.hpp, router.cpp (header and implementation of router class)
+	-> data_segment.hpp, data.segment.cpp (header and implementation of data segment class)
 
 -> ROUTER CLASS: router.hpp, router.cpp
 
