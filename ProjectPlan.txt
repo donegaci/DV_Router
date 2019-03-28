@@ -40,9 +40,10 @@
 		-> destination ports (array of destinaton routers)
 
 	-> METHODS:
-		-> Overloaded Constructor (creates a router given the name, port # and link costs)
+		-> Overloaded Constructor (creates a router given the router's name)
 		-> Getter Methods: GetName, GetPort.....
 		-> Setter Methods: SetName, SetPort.....
+		-> Update_Router_Table (Use Bellman-Ford algorithm to update least cost path to each other router using the received data)
 		-> Print_Router_Table (Prints out Forwarding table for the particular router to the terminal)
 			--------------------------------------------------------------------
 			TIMESTAMP: ----- seconds
@@ -55,12 +56,13 @@
 		-> Write_Router_Table (Writes the forwarding table for the particular router into its .txt file)
 		-> Construct_Message (Encapsulates Distance Vector Forwarding Table in a UDP segment)
 		-> Parse_Message (Parse Distance Vector data from the received UDP segment)
-		-> Update_Router_Table (Use Bellman-Ford algorithm to update least cost path to each other router using the received data)
+		
 
 
 -> DATA SEGMENT CLASS: data_segment.hpp, data.segment.cpp
 	->Each data segment will have a header and a payload
 	->The header will be used to direct the message to its destination and provide information about its purpose
+	->It will contain the source port, destination port, router name, status, message length etc.....
 	->There will be 2 types of segments delivered:
 		1. An update/control message, the payload here will be the distance vectors of the sending router
 		2. A data packet, the payload here will be the contents of a data packet moving through the network (just some text)
