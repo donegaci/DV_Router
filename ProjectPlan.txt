@@ -1,14 +1,15 @@
 ------------------------------3D3 PROJECT 2 PLAN------------------------------
 
 -> EACH ROUTER MUST BE ABLE TO:
-	1. Send and Receive UDP Segments via its own UDP Socket.
-	2. Encapsulate Distance Vector data in a UDP Segment.
-	2. Exchange UDP Distance vector messages with neighbouring routers. (distance vectors are arrays with the cost to each router)
-	3. Upon receiving a message, Parse it and use the data to construct a cost matrix
-	4. Use the Bellman-Ford Algorithm to find the least cost path using this matrix
-	5. If a new least cost path is found, encapsulate the new distance vector in a UDP segment and send it to neighbouring routers
-	6. Write the Router's forwarding/routing table to its own .txt file.
-	7. If a data packet is injected into the network, each router must use its forwarding table to move the packet to its destination.
+	1. Have its members initialised using the topology file
+	2. Send and Receive UDP Segments via its own UDP Socket.
+	3. Encapsulate Distance Vector data in a UDP Segment.
+	4. Exchange UDP Distance vector messages with neighbouring routers. (distance vectors are arrays with the cost to each router)
+	5. Upon receiving a message, Parse it and use the data to check for a new least cost path
+	6. Use the Bellman-Ford Algorithm to find the least cost path using the received data
+	7. If a new least cost path is found, encapsulate the new distance vector in a UDP segment and send it to neighbouring routers
+	8. Write the Router's forwarding/routing table to its own .txt file.
+	9. If a data packet is injected into the network, each router must use its forwarding table to move the packet to its destination.
 
 
 -> CLASSES/FILES NEEDED FOR THE PROJECT:
@@ -33,7 +34,7 @@
 		-> router identifier  (letter of router: A, B, C, D, E, F)
 		-> int router_port   (UDP port # of router: 10000-(A), 10001-(B), 10002-(C), 10003-(D), 10004-(E), 10005-(F))
 		-> other routers (array containing letter identifiers of other routers)
-		-> link costs (array containing link cost to each router)
+		-> link neighbours (array containing link cost to each immediate neighbour)
 		-> int costs[6] (array containing cost to each router)
 		-> outgoing ports (array of port numbers for next-hop routers)
 		-> destination ports (array of destinaton routers)
@@ -55,3 +56,14 @@
 		-> Construct_Message (Encapsulates Distance Vector Forwarding Table in a UDP segment)
 		-> Parse_Message (Parse Distance Vector data from the received UDP segment)
 		-> Update_Router_Table (Use Bellman-Ford algorithm to update least cost path to each other router using the received data)
+
+
+-> DATA SEGMENT CLASS: data_segment.hpp, data.segment.cpp
+	->Each data segment will have a header and a payload
+	->The header will be used to direct the message to its destination and provide information about its purpose
+	->There will be 2 types of segments delivered:
+		1. An update/control message, the payload here will be the distance vectors of the sending router
+		2. A data packet, the payload here will be the contents of a data packet moving through the network (just some text)
+	->There should be a "status" field in the segment's header to distinguish between these types of messages
+	->If a router receives an update/control message, it will parse distance vector and pass its contents on to the router's bellman-ford algorithm to calculate a new least cost path
+	->If a router receives a data packet, it must use its forwarding table to send the packet to the next-hop router in the least cost path to its destination. The router should also write the details of the packet to its text file to log its progress.
