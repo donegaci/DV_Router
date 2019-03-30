@@ -132,3 +132,44 @@ void DVRouter::StoreRoutingTable(){
     writefile.close(); //close the file
     return;
 }
+
+// returns a string with DV table of the format
+// destination,cost
+string DVRouter::ConstructMessage(){
+
+    string s = "";
+    s.push_back(identifier);
+    s.append("'s DV Table\n");
+    for (int i=0; i<6; i++){
+        s.push_back(destinations[i]);
+        s.push_back(',');
+        s.append(to_string(least_costs[i]));
+        s.append("\n");
+    }
+    return s;
+}
+
+// returns a pointer to array of neighbours DV table
+int* DVRouter::ParseMessage(string dvTable) {
+
+    int *arr = new int(6);
+    string s;
+    int pos1, pos2;
+
+    // trim off the header
+    dvTable.erase(0, dvTable.find("\n"));
+
+    for (int i=0; i<6; i++){
+        pos1 = dvTable.find(',');
+        pos2 = dvTable.find('\n');
+        if (pos1 != string::npos && pos2 != string::npos){ // ensure the delimiters are found
+            s = dvTable.substr(pos1+1, pos2-2);
+            arr[i] = stoi(s); // convert string to int
+            dvTable.erase(0, pos2+1);
+        }
+        else
+            arr[i] = 99;
+    }
+
+    return arr;
+}

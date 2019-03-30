@@ -33,4 +33,6 @@ public:
     void PrintRoutingTable();                           //print the router's routing/forwarding table to the terminal
     void StoreRoutingTable();                           //store the router's routing/forwarding table in a text file
 
+    string ConstructMessage();   // returns a string with DV table
+    int* ParseMessage(string dvTable);  // returns a pointer to array of neighbours least costs
 };
