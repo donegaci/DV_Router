@@ -13,7 +13,6 @@ private:
     char identifier;            //letter identifying the router
     int portnum;                //the router's UDP port number
 
-    int neighbour_costs[6];     //link costs to the router's immediate neighbours
     int least_costs[6];         //least cost paths to each destination router in the network
 
     char destinations[6];       //identifiers of all destination routers in the network
@@ -21,6 +20,8 @@ private:
     int next_hop_port[6];       //port number of next-hop router in the least cost path
 
 public:
+    int neighbour_costs[6];     //link costs to the router's immediate neighbours
+
     DVRouter(char router_name);                         //create a router given its identifier
 
     int * getCosts();                                   //function to return a pointer to the least_cost array of the router
