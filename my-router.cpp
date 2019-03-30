@@ -21,62 +21,67 @@ int main(int argc, char* argv[]) {
     int portNumber = router.queryPort(routerID);
     string host = "localhost"; // all routers run on localhost i.e. 127.0.0.1
 
-
-    // Create io service
-    boost::asio::io_service io_service;
-    
-    // create a UDP socket object on portNumber
-    boost::asio::ip::udp::socket socket(io_service, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), portNumber));
-
-    // distance vector routing
-    int pid = fork(); // spawn a new process
-    if (pid < 0){
-        perror("fork failed");
-        return 0;
-    }
-    else if (pid==0){ // This is child process - send to each neighbour periodically
-
-        while(1){
-            string destPort;
-            if(routerID == 'A')
-                destPort = "10001";
-            
-            else
-                destPort = "10000";
-            
-            // resolver object to find the correct remote endpoint to use based on the host and service names
-            boost::asio::ip::udp::resolver resolver(io_service);
-            // Make query to the UDP (ipv4) host server
-            boost::asio::ip::udp::resolver::query query(boost::asio::ip::udp::v4(), host, destPort);
-            // Will return at least one endpoint in the list if it does not fail.
-            // This means it is safe to dereference the return value directly.
-            boost::asio::ip::udp::endpoint receiver_endpoint = *resolver.resolve(query);
-            // Using datagram socket, not stream socket.
-            boost::asio::ip::udp::socket socket(io_service);
-
-            // initiate contact with the remote endpoint
-            socket.open(boost::asio::ip::udp::v4());
-            string message = "I am router ";
-            message.push_back(routerID);
-            socket.send_to(boost::asio::buffer(message), receiver_endpoint);
-
-            sleep(5); // wait 2 seconds
-        }
-
-    }
-    else{ // This is parent process - listen for advertisements
+    try {
+        // Create io service
+        boost::asio::io_service io_service;
         
-        cout << "Router " << routerID << " is running" << endl;
-        while(1) { // forever
-            boost::array<char, BUFFER_SIZE> recv_buf;
-            // The remote_endpoint object will be populated by boost::asio::ip::udp::socket::receive_from().
-            boost::asio::ip::udp::endpoint remote_endpoint;
-            // Receive message
-            boost::system::error_code error;
-            size_t len = socket.receive_from(boost::asio::buffer(recv_buf), remote_endpoint, 0, error);
-            //cout << "Message from: " << remote_endpoint.port() << " of size " << remote_endpoint.size() << endl;
-            cout.write(recv_buf.data(), len) << endl;
+        // create a UDP socket object on portNumber
+        boost::asio::ip::udp::socket socket(io_service, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), portNumber));
+
+        // distance vector routing
+        int pid = fork(); // spawn a new process
+        if (pid < 0){
+            perror("fork failed");
+            return 0;
         }
+        else if (pid==0){ // This is child process - send to each neighbour periodically
+
+            while(1){
+                string destPort;
+
+                for (int i=0; i<6; i++){
+                    // if the routers are direct neighbours
+                    if(router.neighbour_costs[i] != 99 && router.neighbour_costs[i] != 0){
+                        destPort = to_string(router.queryPort( i + 'A'));
+                        // resolver object to find the correct remote endpoint to use based on the host and service names
+                        boost::asio::ip::udp::resolver resolver(io_service);
+                        // Make query to the UDP (ipv4) host server
+                        boost::asio::ip::udp::resolver::query query(boost::asio::ip::udp::v4(), host, destPort);
+                        // Will return at least one endpoint in the list if it does not fail.
+                        // This means it is safe to dereference the return value directly.
+                        boost::asio::ip::udp::endpoint receiver_endpoint = *resolver.resolve(query);
+                        // Using datagram socket, not stream socket.
+                        boost::asio::ip::udp::socket socket(io_service);
+
+                        // initiate contact with the remote endpoint
+                        socket.open(boost::asio::ip::udp::v4());
+                        string message = "I am router ";
+                        message.push_back(routerID);
+                        socket.send_to(boost::asio::buffer(message), receiver_endpoint);
+                    }
+                }
+
+                sleep(5); // wait 2 seconds
+            }
+
+        }
+        else{ // This is parent process - listen for advertisements
+            
+            cout << "Router " << routerID << " is running" << endl;
+            while(1) { // forever
+                boost::array<char, BUFFER_SIZE> recv_buf;
+                // The remote_endpoint object will be populated by boost::asio::ip::udp::socket::receive_from().
+                boost::asio::ip::udp::endpoint remote_endpoint;
+                // Receive message
+                boost::system::error_code error;
+                size_t len = socket.receive_from(boost::asio::buffer(recv_buf), remote_endpoint, 0, error);
+                //cout << "Message from: " << remote_endpoint.port() << " of size " << remote_endpoint.size() << endl;
+                cout.write(recv_buf.data(), len) << endl;
+            }
+        }
+    }
+    catch (std::exception &e) {
+        std::cerr << "Exception: " << e.what() << std::endl;
     }
 
 
