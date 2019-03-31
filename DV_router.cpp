@@ -157,8 +157,7 @@ int* DVRouter::ParseMessage(string dvTable) {
     int pos1, pos2;
 
     // trim off the header
-    dvTable.erase(0, dvTable.find("\n"));
-
+    dvTable.erase(0, dvTable.find("\n")+1);
     for (int i=0; i<6; i++){
         pos1 = dvTable.find(',');
         pos2 = dvTable.find('\n');
@@ -170,6 +169,5 @@ int* DVRouter::ParseMessage(string dvTable) {
         else
             arr[i] = 99;
     }
-
     return arr;
 }

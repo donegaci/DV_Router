@@ -60,7 +60,7 @@ int main(int argc, char* argv[]) {
                         socket.send_to(boost::asio::buffer(message), receiver_endpoint);
                     }
                 }
-                sleep(1); // wait 1 seconds
+                sleep(5); // wait 5 seconds
             }
         }
         // This is parent process - listen for advertisements

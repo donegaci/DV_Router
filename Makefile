@@ -14,7 +14,7 @@ udp-client: $(CLASSES)
 
 clean:
 	rm -rf *.o *~ *.gch *.swp *.dSYM *.tar my-router routing-outputA.txt routing-outputB.txt ...\
-	routing-outputC.txt routing-outputD.txt routing-outputE.txt routing-outputF.txt 
+		routing-outputC.txt routing-outputD.txt routing-outputE.txt routing-outputF.txt 
 
 tarball: clean
 	tar -cvf project2_$(USERID).tar *
