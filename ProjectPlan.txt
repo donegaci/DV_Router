@@ -69,3 +69,30 @@
 	->There should be a "status" field in the segment's header to distinguish between these types of messages
 	->If a router receives an update/control message, it will parse distance vector and pass its contents on to the router's bellman-ford algorithm to calculate a new least cost path
 	->If a router receives a data packet, it must use its forwarding table to send the packet to the next-hop router in the least cost path to its destination. The router should also write the details of the packet to its text file to log its progress.
+---------------------------------------------------------------------------------------------------------------------------------------
+TO DO:
+
+-> ROUTER-ROUTER COMMUNICATION:
+	-> Encapsulate distance vectors in UDP segments using UDP Segment struct
+	-> Send these UDP segments to other routers instead of just the distance vectors
+	-> Upon receiving UDP segments, parse the distance vectors before passing to the Bellman Ford method
+
+-> TRAFFIC GENERATOR
+	-> Have a method to inject a data packet into the network.
+	-> Use the status field in the UDP segment header to identify it as a packet
+	-> If the receiving router is the desination (same port # as dest port # in header), print to the text file received: [the payload of the packet]
+	-> Otherwise, use the routing table to send the packet to the next-hop router on the least cost path to the destination router and print to the text file that a packet has been forwarded
+
+-> PRINTING TO TEXT FILES
+	-> Start a timer when the router object is created in my-router.cpp and whenever anything is printed to the text file, include the current time
+	-> Change printing so that only routers with known paths are shown, any with distance 99 will not be printed
+	-> Only Print to the text file if a large change has been found i.e. discovering a new router (new cost < 99) or a number of least cost paths being updated
+	-> Instead of only printing the new routing table, print the old one, the received table that caused the change, the ID of the router that sent this table, and the new table
+
+-> BELLMAN FORD
+	-> Allow for a link cost between two neighbours to be introduced, and have all routers recalculate their DVs based on this change
+
+-> DEMO
+	-> PowerPoint slidescl
+	-> Report
+	-> Script to start the 6 routers in a random order
