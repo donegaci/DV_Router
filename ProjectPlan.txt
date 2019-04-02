@@ -89,10 +89,7 @@ TO DO:
 	-> Only Print to the text file if a large change has been found i.e. discovering a new router (new cost < 99) or a number of least cost paths being updated
 	-> Instead of only printing the new routing table, print the old one, the received table that caused the change, the ID of the router that sent this table, and the new table
 
--> BELLMAN FORD
-	-> Allow for a link cost between two neighbours to be introduced, and have all routers recalculate their DVs based on this change
-
 -> DEMO
-	-> PowerPoint slidescl
+	-> PowerPoint slides
 	-> Report
 	-> Script to start the 6 routers in a random order
