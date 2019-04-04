@@ -60,7 +60,7 @@ int * DVRouter::getCosts(){
 }
 
 //calculate the least cost path to each router in the network, given a neighbouring router's least cost array
-void DVRouter::BellmanFord(char sender, int * in_costs){
+bool DVRouter::BellmanFord(char sender, int * in_costs){
     int index = sender - 65;
     int link = neighbour_costs[index];
     int newcost;
@@ -72,6 +72,7 @@ void DVRouter::BellmanFord(char sender, int * in_costs){
             next_hop_port[i] = queryPort(sender);
         }
     }
+    return true;
 }
 
 //find the UDP port number associated with the router identifier
@@ -100,12 +101,52 @@ int DVRouter::queryPort(char dest_name){
     else return 0;
 }
 
+//find the router identifier associated with the router port number
+int DVRouter::queryID(int port){
+    if(port == 10000){
+        return 'A';
+    }
+    else if(port == 10001){
+        return 'B';
+    }
+    else if(port == 10002){
+        return 'C';
+    }
+    else if(port == 10003){
+        return 'D';
+    }
+    else if(port == 10004){
+        return 'E';
+    }
+    else if(port == 10005){
+        return 'F';
+    }
+    else return 'X';
+}
+
 //print the router's routing/forwarding table to the terminal
-void DVRouter::PrintRoutingTable(){
+void DVRouter::PrintRoutingTable(double curr_time, int * rcvd_table, char ID){
     cout << "----------------------------------------------------------------------\n";
+    cout << "|Time: " << setw(2) << left << curr_time << " seconds                                                    |\n";
+    if(ID){
+        cout << "----------------------------------------------------------------------\n";
+        cout << "|Distance Vector received from neighbour " << ID << "                           |\n";
+        cout << "|Destination    |Cost" << "                                                |\n";
+        for (int i=0; i<6; i++){
+            if(least_costs[i] != 99 && least_costs[i] != 0){
+                cout << "|" << setw(15) << left << destinations[i] << "|" << setw(8) << left << rcvd_table[i] << "                                            |\n";
+            }
+            else continue;
+        }
+        cout << "----------------------------------------------------------------------\n";
+        cout <<"|" << identifier <<"'s new Routing Table:                                              |\n";
+    }
     cout << "|Destination    |Cost    |Outgoing Port   |Next Hop    |Next Hop Port|\n";
     for (int i=0; i<6; i++){
-        cout << "|" << setw(15) << left << destinations[i] << "|" << setw(8) << left << least_costs[i] << "|" << setw(16) << left << portnum << "|" << setw(12) << left << next_hop[i] << "|" << setw(13) << left << next_hop_port[i] << "|\n";
+        if(least_costs[i] != 99 && least_costs[i] != 0){
+            cout << "|" << setw(15) << left << destinations[i] << "|" << setw(8) << left << least_costs[i] << "|" << setw(16) << left << portnum << "|" << setw(12) << left << next_hop[i] << "|" << setw(13) << left << next_hop_port[i] << "|\n";
+        }
+        else continue;
     }
     cout << "----------------------------------------------------------------------\n";
     cout << endl;
@@ -113,7 +154,7 @@ void DVRouter::PrintRoutingTable(){
 }
 
 //store the router's routing/forwarding table in a text file
-void DVRouter::StoreRoutingTable(){
+void DVRouter::StoreRoutingTable(double curr_time, int * rcvd_table, char ID){
     ofstream writefile; //open file using ofstream
 
     string n[1];
@@ -121,10 +162,27 @@ void DVRouter::StoreRoutingTable(){
     string filename = "routing-output" + n[0] + ".txt"; //use the router's name to open the correct file
 
     writefile.open(filename, ios_base::app); //open and append
-    writefile << "----------------------------------------------------------------------\n";
+        writefile << "----------------------------------------------------------------------\n";
+    writefile << "|Time: " << setw(2) << left << curr_time << " seconds                                                    |\n";
+    if(ID){
+        writefile << "----------------------------------------------------------------------\n";
+        writefile << "|Distance Vector received from neighbour " << ID << "                           |\n";
+        writefile << "|Destination    |Cost" << "                                                |\n";
+        for (int i=0; i<6; i++){
+            if(least_costs[i] != 99 && least_costs[i] != 0){
+                writefile << "|" << setw(15) << left << destinations[i] << "|" << setw(8) << left << rcvd_table[i] << "                                            |\n";
+            }
+            else continue;
+        }
+        writefile << "----------------------------------------------------------------------\n";
+        writefile <<"|" << identifier <<"'s new Routing Table:                                              |\n";
+    }
     writefile << "|Destination    |Cost    |Outgoing Port   |Next Hop    |Next Hop Port|\n";
     for (int i=0; i<6; i++){
-        writefile << "|" << setw(15) << left << destinations[i] << "|" << setw(8) << left << least_costs[i] << "|" << setw(16) << left << portnum << "|" << setw(12) << left << next_hop[i] << "|" << setw(13) << left << next_hop_port[i] << "|\n";
+        if(least_costs[i] != 99 && least_costs[i] != 0){
+            writefile << "|" << setw(15) << left << destinations[i] << "|" << setw(8) << left << least_costs[i] << "|" << setw(16) << left << portnum << "|" << setw(12) << left << next_hop[i] << "|" << setw(13) << left << next_hop_port[i] << "|\n";
+        }
+        else continue;
     }
     writefile << "----------------------------------------------------------------------\n";
     writefile << endl;
