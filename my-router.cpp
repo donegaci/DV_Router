@@ -3,6 +3,7 @@
 #include <boost/asio.hpp>
 #include <unistd.h>
 #include <string.h>
+#include <time.h>
 
 #define BUFFER_SIZE 2000 // This is the udp receive buffer size
 
@@ -16,11 +17,15 @@ int main(int argc, char* argv[]) {
 
     char routerID = *argv[1];
     DVRouter router(routerID); // create DV router object
-    router.PrintRoutingTable(); // print out the initial routing table
+    time_t start = time(0); // time = 0 when router is created
+    double seconds_since_start;
+    cout << "Router " << routerID << " is running" << endl;
+    cout << "Router " << routerID << "'s Initial Routing Table:\n";
+    router.PrintRoutingTable(seconds_since_start, NULL, NULL); // print out the initial routing table
 
     int portNumber = router.queryPort(routerID);
     string host = "localhost"; // all routers run on localhost i.e. 127.0.0.1
-
+    
 
     try {
         // Create io service
@@ -65,7 +70,7 @@ int main(int argc, char* argv[]) {
         }
         // This is parent process - listen for advertisements
         else { 
-            cout << "Router " << routerID << " is running" << endl;
+            //cout << "Router " << routerID << " is running" << endl;
             while(1) { // forever
                 boost::array<char, BUFFER_SIZE> recv_buf;
                 // The remote_endpoint object will be populated by boost::asio::ip::udp::socket::receive_from().
@@ -73,7 +78,7 @@ int main(int argc, char* argv[]) {
                 // Receive message
                 boost::system::error_code error;
                 size_t len = socket.receive_from(boost::asio::buffer(recv_buf), remote_endpoint, 0, error);
-                cout.write(recv_buf.data(), len) << endl;
+                //cout.write(recv_buf.data(), len) << endl;
                 int * neighbour_table = router.ParseMessage(recv_buf.data());
                 char neighbour;
                 // update neighbour to reflect what table we just recieved
@@ -81,12 +86,15 @@ int main(int argc, char* argv[]) {
                     if (neighbour_table[i] == 0)
                         neighbour = i + 'A';
                 }
-                router.BellmanFord(neighbour, neighbour_table);
-                router.PrintRoutingTable();
-                router.StoreRoutingTable();
+                seconds_since_start = difftime( time(0), start);
+                if(router.BellmanFord(neighbour, neighbour_table)){ //Use the Bellman-Ford algorithm to update the routing table
+                    router.PrintRoutingTable(seconds_since_start, neighbour_table, neighbour);
+                    //router.StoreRoutingTable(seconds_since_start, neighbour_table, neighbour);
+                }
             }
         }
     }
+    
     catch (std::exception &e) {
         std::cerr << "Exception: " << e.what() << std::endl;
     }
