@@ -1,16 +1,13 @@
 CXX=g++
 CXXOPTIMIZE= -O2
-CXXFLAGS= -g -Wall -pthread  $(CXXOPTIMIZE)
+CXXFLAGS= -std=c++11 -g -Wall -pthread -lboost_system $(CXXOPTIMIZE)
 USERID=Group15
-CLASSES=
+CLASSES= DV_router.hpp
 
 all: my-router
 
-udp-server: $(CLASSES)
-	$(CXX) -o $@ $^ $(CXXFLAGS) $@.cpp
-	
-udp-client: $(CLASSES)
-	$(CXX) -o $@ $^ $(CXXFLAGS) $@.cpp
+my-router: $(CLASSES)
+	$(CXX) -o $@ $^ $@.cpp $(CXXFLAGS)
 
 clean:
 	rm -rf *.o *~ *.gch *.swp *.dSYM *.tar my-router routing-outputA.txt routing-outputB.txt ...\
