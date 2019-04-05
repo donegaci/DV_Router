@@ -39,6 +39,11 @@ class DataSegment{
         // returns a string of data segment in the format of the structure above
         string constructDataSegment();
         
+        char getStatus() {return header.status;}
+        string getPayload() {return payload;}
+        int getDestPort() {return header.destPort;}
+        int getSourcePort() {return header.sourcePort;}
+        
         // This is mostly for testing purposes
         void printDataSegment();
 };
