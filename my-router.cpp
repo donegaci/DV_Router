@@ -1,11 +1,12 @@
 #include "DV_router.cpp"
+#include "DataSegment.cpp"
 #include <boost/array.hpp>
 #include <boost/asio.hpp>
 #include <unistd.h>
 #include <string.h>
 #include <time.h>
 
-#define BUFFER_SIZE 2000 // This is the udp receive buffer size
+#define BUFFER_SIZE 8192 // This is the udp receive buffer size
 
 // usage: ./my-router [routerID]
 int main(int argc, char* argv[]) {
@@ -18,10 +19,10 @@ int main(int argc, char* argv[]) {
     char routerID = *argv[1];
     DVRouter router(routerID); // create DV router object
     time_t start = time(0); // time = 0 when router is created
-    double seconds_since_start;
+    double seconds_since_start = 0;
     cout << "Router " << routerID << " is running" << endl;
     cout << "Router " << routerID << "'s Initial Routing Table:\n";
-    router.PrintRoutingTable(seconds_since_start, NULL, NULL); // print out the initial routing table
+    router.PrintRoutingTable(seconds_since_start, NULL, '\0'); // print out the initial routing table
 
     int portNumber = router.queryPort(routerID);
     string host = "localhost"; // all routers run on localhost i.e. 127.0.0.1
@@ -62,7 +63,11 @@ int main(int argc, char* argv[]) {
                         // initiate contact with the remote endpoint
                         socket.open(boost::asio::ip::udp::v4());
                         string message = router.ConstructMessage();
-                        socket.send_to(boost::asio::buffer(message), receiver_endpoint);
+
+                        // create data segment object
+                        DataSegment packetOut('C', portNumber, stoi(destPort), message.length(), message);
+                        // construct a string of data segment and send over udp
+                        socket.send_to(boost::asio::buffer(packetOut.constructDataSegment()), receiver_endpoint);
                     }
                 }
                 sleep(5); // wait 5 seconds
@@ -78,18 +83,24 @@ int main(int argc, char* argv[]) {
                 // Receive message
                 boost::system::error_code error;
                 size_t len = socket.receive_from(boost::asio::buffer(recv_buf), remote_endpoint, 0, error);
-                //cout.write(recv_buf.data(), len) << endl;
-                int * neighbour_table = router.ParseMessage(recv_buf.data());
-                char neighbour;
-                // update neighbour to reflect what table we just recieved
-                for (int i=0; i<6; i++){
-                    if (neighbour_table[i] == 0)
-                        neighbour = i + 'A';
-                }
-                seconds_since_start = difftime( time(0), start);
-                if(router.BellmanFord(neighbour, neighbour_table)){ //Use the Bellman-Ford algorithm to update the routing table
-                    router.PrintRoutingTable(seconds_since_start, neighbour_table, neighbour);
-                    //router.StoreRoutingTable(seconds_since_start, neighbour_table, neighbour);
+                if (len > 0){
+                    // create a data segment object from data of udp message
+                    DataSegment packetIn(recv_buf.data());
+                    // Check if the packet is a control message
+                    if (packetIn.getStatus() == 'C'){
+                        int * neighbour_table = router.ParseMessage(packetIn.getPayload());
+                        char neighbour;
+                        // update neighbour to reflect what table we just recieved
+                        for (int i=0; i<6; i++){
+                            if (neighbour_table[i] == 0)
+                                neighbour = i + 'A';
+                        }
+                        seconds_since_start = difftime( time(0), start);
+                        if(router.BellmanFord(neighbour, neighbour_table)){ //Use the Bellman-Ford algorithm to update the routing table
+                            router.PrintRoutingTable(seconds_since_start, neighbour_table, neighbour);
+                            //router.StoreRoutingTable(seconds_since_start, neighbour_table, neighbour);
+                        }
+                    }
                 }
             }
         }
@@ -98,84 +109,5 @@ int main(int argc, char* argv[]) {
     catch (std::exception &e) {
         std::cerr << "Exception: " << e.what() << std::endl;
     }
-
-
-
-    // //create a DVRouter object for each router in the network
-    // DVRouter A ('A');
-    // DVRouter B ('B');
-    // DVRouter C ('C');
-    // DVRouter D ('D');
-    // DVRouter E ('E');
-    // DVRouter F ('F');
-    
-    // //print out the initial routing table for each router
-    // cout << "--------------------INITIAL ROUTING TABLES--------------------\n";
-    // A.PrintRoutingTable();
-    // B.PrintRoutingTable();
-    // C.PrintRoutingTable();
-    // D.PrintRoutingTable();
-    // E.PrintRoutingTable();
-    // F.PrintRoutingTable();
-
-    // //store the initial routing table for each router
-    // A.StoreRoutingTable();
-    // B.StoreRoutingTable();
-    // C.StoreRoutingTable();
-    // D.StoreRoutingTable();
-    // E.StoreRoutingTable();
-    // F.StoreRoutingTable();
-
-    // //This simulates the an exchange of messages between each router in the network and its neighbours
-    // //Each router will receive distance vectors (least cost arrays) from each of its direct neighbours and use the values in these arrays to find a new least cost path
-    // //as more rounds of messages are exchanged, the routing table for each router will converge to a steady state
-    // for(int i=0; i<3; i++){
-    //     //A receives messages from its neighbours A and E
-    //     A.BellmanFord('B', B.getCosts());
-    //     A.BellmanFord('E', E.getCosts());
-
-    //     //B receives distance vectors from A, C, E and F
-    //     B.BellmanFord('A', A.getCosts());
-    //     B.BellmanFord('C', C.getCosts());
-    //     B.BellmanFord('E', E.getCosts());
-    //     B.BellmanFord('F', F.getCosts());
-
-    //     //C receives messages from its neighbours B, D and F
-    //     C.BellmanFord('B', B.getCosts());
-    //     C.BellmanFord('D', D.getCosts());
-    //     C.BellmanFord('F', F.getCosts());
-
-    //     //D receives messages from its neighbours C and F
-    //     D.BellmanFord('C', C.getCosts());
-    //     D.BellmanFord('F', F.getCosts());
-
-    //     //E receives messages from its neighbours A, B and F
-    //     E.BellmanFord('A', A.getCosts());
-    //     E.BellmanFord('B', B.getCosts());
-    //     E.BellmanFord('F', F.getCosts());
-
-    //     //F receives messages from its neighbours B, C, D and E
-    //     F.BellmanFord('B', B.getCosts());
-    //     F.BellmanFord('C', C.getCosts());
-    //     F.BellmanFord('D', D.getCosts());
-    //     F.BellmanFord('E', E.getCosts());
-
-    //     //print out the routing table for each router after each exchange of messages
-    //     cout << "--------------------ROUTING TABLES AFTER EXCHANGE " << i+1 << "--------------------\n";
-    //     A.PrintRoutingTable();
-    //     B.PrintRoutingTable();
-    //     C.PrintRoutingTable();
-    //     D.PrintRoutingTable();
-    //     E.PrintRoutingTable();
-    //     F.PrintRoutingTable();
-
-    //     //store the routing table for each router
-    //     A.StoreRoutingTable();
-    //     B.StoreRoutingTable();
-    //     C.StoreRoutingTable();
-    //     D.StoreRoutingTable();
-    //     E.StoreRoutingTable();
-    //     F.StoreRoutingTable();
-    // }
 
 }

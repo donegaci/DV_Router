@@ -210,7 +210,7 @@ string DVRouter::ConstructMessage(){
 // returns a pointer to array of neighbours DV table
 int* DVRouter::ParseMessage(string dvTable) {
 
-    int *arr = new int(6);
+    static int arr[6];
     string s;
     int pos1, pos2;
 

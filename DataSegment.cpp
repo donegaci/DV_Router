@@ -18,7 +18,7 @@ DataSegment::DataSegment(string dataSegment){
 
     // parse the string
     char delimitter = ' ';
-    int position;
+    unsigned long position = string::npos;
 
     // set status 
     if ( (position = dataSegment.find(delimitter)) != string::npos ){
