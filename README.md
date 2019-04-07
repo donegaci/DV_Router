@@ -8,11 +8,11 @@ The project implements a router that communicates with other routers by exchangi
 
 This project uses the **Boost Library**. See [Getting Started Guide](https://www.boost.org/doc/libs/1_66_0/more/getting_started/unix-variants.html) for install instructions.
 
-To run the startup script, `startup.sh`, on Mac, you will need to install Xquartz available [here](https://www.xquartz.org/).
+To run the startup script, `startup.sh`, on Mac, you will need to install **Xquartz** available [here](https://www.xquartz.org/).
 
 
 To run the code and start up all routers:
 ```
 make
-./startup.sh
+./startup
 ```
