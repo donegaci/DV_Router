@@ -18,7 +18,7 @@ private:
     char destinations[6];       //identifiers of all destination routers in the network
     char next_hop[6];           //identifier of the next-hop routers in the least-cost path
     int next_hop_port[6];       //port number of next-hop router in the least cost path
-
+    
 public:
     int neighbour_costs[6];                                         //link costs to the router's immediate neighbours
 
@@ -29,7 +29,9 @@ public:
 
     int queryPort(char dest_name);                                  //find the UDP port number associated with the router's name
     int queryID(int port);                                          //find the router identifier associated with the router port number
-
+ 
+    int getNextHopPort(int destRouterID){return next_hop_port[destRouterID - 'A'];}                      
+    
     void PrintRoutingTable(double curr_time, int * rcvd_table, char ID);     //print the router's routing/forwarding table to the terminal
     void StoreRoutingTable(double curr_time, int * rcvd_table, char ID);     //store the router's routing/forwarding table in a text file
 
