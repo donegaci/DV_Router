@@ -25,6 +25,7 @@ public:
     DVRouter(char router_name);                                     //create a router given its identifier
 
     int * getCosts();                                               //function to return a pointer to the least_cost array of the router
+    void ReadCosts(); 
     bool BellmanFord(char sender, int * in_costs);                  //calculate the least cost path to each router in the network, given a neighbouring router's least cost array
 
     int queryPort(char dest_name);                                  //find the UDP port number associated with the router's name
