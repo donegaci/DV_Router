@@ -229,3 +229,51 @@ int* DVRouter::ParseMessage(string dvTable) {
     }
     return arr;
 }
+
+void DVRouter::ReadCosts(){
+    ifstream writefile; //open file using ofstream
+
+    string n[1];
+    n[0] = identifier;
+    string filename = "routing-output" + n[0] + ".txt"; //use the router's name to open the correct file
+
+    writefile.open(filename, ios_base::in); //open
+    string findstring[6] = {"|A             ", "|B             ", "|C             ", "|D             ", "|E             ", "|F             "};
+    string line;
+    int foundline[6] = {0, 0, 0, 0, 0, 0};
+    int currline = 0;
+
+    for(int i=0; i<6; i++){
+        currline = 0;
+        while(getline(writefile, line)){
+            currline++;
+            if(line.find(findstring[i], 0) != string::npos){
+                foundline[i] = currline;
+            }
+            else continue;
+        }
+        writefile.clear();
+        writefile.seekg(0, ios::beg);
+    }
+
+    for(int i=0; i<6; i++){
+        if(foundline[i]>0){
+        currline = 0;
+        while(getline(writefile, line)){
+            currline++;
+            if(currline == foundline[i]){
+                break;
+            }
+            else continue;
+        }
+        string temp = line;
+        char newval = temp[17];
+        least_costs[i] = newval-48;
+        writefile.clear();
+        writefile.seekg(0, ios::beg);
+        }
+        else continue;
+    }
+
+    writefile.close(); //close the file
+}
