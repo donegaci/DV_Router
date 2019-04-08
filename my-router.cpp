@@ -73,6 +73,7 @@ int main(int argc, char* argv[]) {
 
                         // initiate contact with the remote endpoint
                         socket.open(boost::asio::ip::udp::v4());
+                        router.ReadCosts();
                         string message = router.ConstructMessage();
 
                         // create data segment object
@@ -108,7 +109,7 @@ int main(int argc, char* argv[]) {
                         seconds_since_start = difftime( time(0), start);
                         if(router.BellmanFord(neighbour, neighbour_table)){ //Use the Bellman-Ford algorithm to update the routing table
                             router.PrintRoutingTable(seconds_since_start, neighbour_table, neighbour);
-                            //router.StoreRoutingTable(seconds_since_start, neighbour_table, neighbour);
+                            router.StoreRoutingTable(seconds_since_start, neighbour_table, neighbour);
                         }
                     }
                     // must be a data packet that we have to route through the network
