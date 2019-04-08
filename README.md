@@ -10,7 +10,7 @@ This project uses the **Boost Library**. See [Getting Started Guide](https://www
 
 To run the startup script, `startup.sh`, on Mac, you will need to install **Xquartz** available [here](https://www.xquartz.org/).
 
-To run shell scripts you will need to them execute permission.
+To run shell scripts you will need to give them executable permission.
 ```
 chmod +x <filename>
 ```
