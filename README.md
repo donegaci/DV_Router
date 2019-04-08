@@ -10,10 +10,7 @@ This project uses the **Boost Library**. See [Getting Started Guide](https://www
 
 To run the startup script, `startup.sh`, on Mac, you will need to install **Xquartz** available [here](https://www.xquartz.org/).
 
-To run shell scripts you will need to them execute permission.
-```
-chmod +x <filename>
-```
+To run shell scripts you will need to give them execute permission. `chmod +x <filename>`
 
 ### To compile the code and start up all routers:
 ```
