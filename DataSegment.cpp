@@ -67,8 +67,12 @@ string DataSegment::constructDataSegment(){
 }
 
 void DataSegment::printDataSegment(){
-
-    cout << header.status  << " " << header.sourcePort << " " << header.destPort << " " 
-        << header.payloadLength << endl
-        << payload << endl;
+    cout << " ---------------------------------------------------------------------------" << endl;
+    cout << "|  Status " << header.status  
+        << " |  SourcePort " << header.sourcePort 
+        << " |  DestinationPort " << header.destPort 
+        << " |  Length " << header.payloadLength  << "   |" << endl
+        << " ---------------------------------------------------------------------------" << endl
+        << "| " << payload << endl
+        << " ---------------------------------------------------------------------------" << endl;
 }

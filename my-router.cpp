@@ -154,10 +154,10 @@ int main(int argc, char* argv[]) {
 
 void trafficGenerator(){
 
-    string payload = "This is a data packet. Let's see if it can make it's way from router A to F";
+    string payload = "This is a data packet. Let's see if it can make it's way from router A to D";
     // create a data segment object with status = 'D' to denote a data packet
     int originPort = 10000; // A
-    int destinationPort = 10005; // F
+    int destinationPort = 10003; // D
 
     DataSegment dataPacket('D', originPort, destinationPort, payload.length(), payload);
     // print the datapacket to console
